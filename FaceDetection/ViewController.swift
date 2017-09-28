@@ -32,9 +32,9 @@ class ViewController: UIViewController {
         let cameraView = visage!.visageCameraView
         self.view.addSubview(cameraView)
         
-        let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-        visualEffectView.frame = self.view.bounds
-        self.view.addSubview(visualEffectView)
+//        let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//        visualEffectView.frame = self.view.bounds
+//        self.view.addSubview(visualEffectView)
         
         emojiLabel.text = "😐"
         emojiLabel.font = UIFont.systemFont(ofSize: 50)
