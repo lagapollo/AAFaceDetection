@@ -11,7 +11,25 @@ import CoreImage
 import AVFoundation
 import ImageIO
 
-class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
+
+extension String {
+    func image() -> UIImage! {
+        let size = CGSize(width: 30, height: 35)
+        UIGraphicsBeginImageContextWithOptions(size, false, 0);
+        UIColor.white.set()
+        
+        let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: size)
+        UIRectFill(CGRect(origin: CGPoint(x: 0, y: 0), size: size))
+        
+        (self as NSString).draw(in: rect, withAttributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 30)])
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image!
+    }
+    
+}
+
+class Visage: NSObject {
     
     enum DetectorAccuracy {
         case batterySaving
@@ -64,96 +82,18 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     fileprivate let notificationCenter : NotificationCenter = NotificationCenter.default
     fileprivate var currentOrientation : Int?
     
-    init(cameraPosition : CameraDevice, optimizeFor : DetectorAccuracy) {
+    override init() {
         super.init()
-        
-        currentOrientation = convertOrientation(UIDevice.current.orientation)
-        
-        switch cameraPosition {
-        case .faceTimeCamera : self.captureSetup(AVCaptureDevicePosition.front)
-        case .iSightCamera : self.captureSetup(AVCaptureDevicePosition.back)
-        }
-        
-        var faceDetectorOptions : [String : AnyObject]?
-        
-        switch optimizeFor {
-        case .batterySaving : faceDetectorOptions = [CIDetectorAccuracy : CIDetectorAccuracyLow as AnyObject]
-        case .higherPerformance : faceDetectorOptions = [CIDetectorAccuracy : CIDetectorAccuracyHigh as AnyObject]
-        }
-        
+        let faceDetectorOptions = [CIDetectorAccuracy : CIDetectorAccuracyHigh as AnyObject]
         self.faceDetector = CIDetector(ofType: CIDetectorTypeFace, context: nil, options: faceDetectorOptions)
     }
-    
-    //MARK: SETUP OF VIDEOCAPTURE
-    func beginFaceDetection() {
-        self.captureSession.startRunning()
-    }
-    
-    func endFaceDetection() {
-        self.captureSession.stopRunning()
-    }
-    
-    fileprivate func captureSetup (_ position : AVCaptureDevicePosition) {
-        var captureError : NSError?
-        var captureDevice : AVCaptureDevice!
-        
-        for testedDevice in AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo){
-            if ((testedDevice as AnyObject).position == position) {
-                captureDevice = testedDevice as! AVCaptureDevice
-            }
-        }
-        
-        if (captureDevice == nil) {
-            captureDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
-        }
-        
-        var deviceInput : AVCaptureDeviceInput?
-        do {
-            deviceInput = try AVCaptureDeviceInput(device: captureDevice)
-        } catch let error as NSError {
-            captureError = error
-            deviceInput = nil
-        }
-        captureSession.sessionPreset = AVCaptureSessionPresetHigh
-        
-        if (captureError == nil) {
-            if (captureSession.canAddInput(deviceInput)) {
-                captureSession.addInput(deviceInput)
-            }
-            
-            self.videoDataOutput = AVCaptureVideoDataOutput()
-            self.videoDataOutput!.videoSettings = [kCVPixelBufferPixelFormatTypeKey as AnyHashable: Int(kCVPixelFormatType_32BGRA)]
-            self.videoDataOutput!.alwaysDiscardsLateVideoFrames = true
-            self.videoDataOutputQueue = DispatchQueue(label: "VideoDataOutputQueue", attributes: [])
-            self.videoDataOutput!.setSampleBufferDelegate(self, queue: self.videoDataOutputQueue!)
-            
-            if (captureSession.canAddOutput(self.videoDataOutput)) {
-                captureSession.addOutput(self.videoDataOutput)
-            }
-        }
-        
-        visageCameraView.frame = UIScreen.main.bounds
-		
-		let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer?.frame = UIScreen.main.bounds
-        previewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
-        visageCameraView.layer.addSublayer(previewLayer!)
-    }
-    
     var options : [String : AnyObject]?
-    
-    //MARK: CAPTURE-OUTPUT/ANALYSIS OF FACIAL-FEATURES
-    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
-        
-        let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
-        let opaqueBuffer = Unmanaged<CVImageBuffer>.passUnretained(imageBuffer!).toOpaque()
-        let pixelBuffer = Unmanaged<CVPixelBuffer>.fromOpaque(opaqueBuffer).takeUnretainedValue()
-        let sourceImage = CIImage(cvPixelBuffer: pixelBuffer, options: nil)
-        options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject, CIDetectorImageOrientation : 6 as AnyObject]
-        
-        let features = self.faceDetector!.features(in: sourceImage, options: options)
-        
-        if (features.count != 0) {
+
+    func detectFeatures(withFeatures features:[CIFaceFeature]) {
+//        options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject, CIDetectorImageOrientation : 6 as AnyObject]
+//        let features = self.faceDetector!.features(in: sourceImage, options: options)
+//
+        if (features.count > 0) {
             
             if (onlyFireNotificatonOnStatusChange == true) {
                 if (self.faceDetected == false) {
@@ -299,6 +239,45 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
     }
     
+    
+    func convertFeaturesToEmoji() -> String {
+        
+        var emojiLabel = ""
+        print("=============================")
+        print("leftEyeClose : \(String(describing: self.leftEyeClosed))")
+        print("rightEyeClose : \(String(describing: self.rightEyeClosed))")
+        print("hasSmile : \(String(describing: self.hasSmile))")
+        print("isWinking : \(String(describing: self.isWinking))")
+        print("isBlinking : \(String(describing: self.isBlinking))")
+        
+        emojiLabel = "😐"
+        if (self.hasSmile == true) {
+            if (self.isWinking == true){
+                emojiLabel = "😜"
+            }
+            else if (self.leftEyeClosed == true && self.rightEyeClosed == true){
+                emojiLabel = "😵"
+            }
+            else {
+                emojiLabel = "😃"
+            }
+        }
+        else {
+            if (self.isWinking == true){
+                emojiLabel = "😉"
+            }
+        }
+        if ((self.leftEyeClosed == true && self.rightEyeClosed == true)){
+            emojiLabel = "😴"
+            
+        }
+        return emojiLabel
+    }
+    
+    func convertFeaturesToEmojiImage() -> UIImage {
+        return convertFeaturesToEmoji().image()
+    }
+    
     //TODO: 🚧 HELPER TO CONVERT BETWEEN UIDEVICEORIENTATION AND CIDETECTORORIENTATION 🚧
     fileprivate func convertOrientation(_ deviceOrientation: UIDeviceOrientation) -> Int {
         var orientation: Int = 0
@@ -316,3 +295,7 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         return 6
     }
 }
+
+
+
+

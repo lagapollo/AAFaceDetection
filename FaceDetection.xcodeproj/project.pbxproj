@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		80C316091A46F3F800E4493F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C316081A46F3F800E4493F /* AppDelegate.swift */; };
-		80C3160B1A46F3F800E4493F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C3160A1A46F3F800E4493F /* ViewController.swift */; };
 		80C3160E1A46F3F800E4493F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80C3160C1A46F3F800E4493F /* Main.storyboard */; };
 		80C316131A46F3F800E4493F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 80C316111A46F3F800E4493F /* LaunchScreen.xib */; };
 		80C3161F1A46F3F800E4493F /* FaceDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C3161E1A46F3F800E4493F /* FaceDetectionTests.swift */; };
@@ -34,7 +33,6 @@
 		80C316031A46F3F800E4493F /* FaceDetection.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FaceDetection.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		80C316071A46F3F800E4493F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		80C316081A46F3F800E4493F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		80C3160A1A46F3F800E4493F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		80C3160D1A46F3F800E4493F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		80C316121A46F3F800E4493F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		80C316181A46F3F800E4493F /* FaceDetectionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FaceDetectionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,7 +89,6 @@
 			children = (
 				F91F602F1F7D47AE0005CA79 /* AR */,
 				80C316081A46F3F800E4493F /* AppDelegate.swift */,
-				80C3160A1A46F3F800E4493F /* ViewController.swift */,
 				80C316281A46F41F00E4493F /* Visage.swift */,
 				80C3160C1A46F3F800E4493F /* Main.storyboard */,
 				F91F60711F7D54C30005CA79 /* Images.xcassets */,
@@ -203,7 +200,7 @@
 				TargetAttributes = {
 					80C316021A46F3F800E4493F = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = 6CY9L434R3;
+						DevelopmentTeam = JP99H4V8K4;
 						LastSwiftMigration = 0820;
 					};
 					80C316171A46F3F800E4493F = {
@@ -257,7 +254,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80C3160B1A46F3F800E4493F /* ViewController.swift in Sources */,
 				F91F606D1F7D4CFB0005CA79 /* LiveTranscribeViewController.swift in Sources */,
 				F91F606E1F7D4D0E0005CA79 /* FaceReplacer.swift in Sources */,
 				80C316291A46F41F00E4493F /* Visage.swift in Sources */,
@@ -338,7 +334,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -375,7 +371,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -387,11 +383,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 6CY9L434R3;
+				DEVELOPMENT_TEAM = JP99H4V8K4;
 				INFOPLIST_FILE = FaceDetection/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.juhennet.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.genesis.FaceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -402,11 +398,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 6CY9L434R3;
+				DEVELOPMENT_TEAM = JP99H4V8K4;
 				INFOPLIST_FILE = FaceDetection/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.juhennet.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.genesis.FaceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;

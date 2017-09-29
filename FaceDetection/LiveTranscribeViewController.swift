@@ -42,11 +42,15 @@ class LiveTranscribeViewController: UIViewController {
     
     @IBOutlet weak var transcriptionOutputLabel: UILabel!
     
+    var visage: Visage! = Visage()
+    
     @IBAction func handleDoneTapped(_ sender: Any?) {
         faceReplacer.stopCapture()
         dismiss(animated: true, completion: .none)
     }
     
+    @IBOutlet weak var viewRender: UIView!
+    @IBOutlet weak var ivRender: UIImageView!
     override func viewDidLoad() {
         super.viewDidLoad()
         initialiseFaceReplacer()
@@ -66,19 +70,17 @@ extension LiveTranscribeViewController {
 
 extension LiveTranscribeViewController {
     fileprivate func initialiseFaceReplacer() {
-        faceReplacer = FaceReplacer(imageView: glkView)
+        faceReplacer = FaceReplacer(imageView: glkView, finalRenderView:self.ivRender)
         do {
-            try faceReplacer.startCapture()
+            try faceReplacer.startCapture(imageView: viewRender)
         } catch let error as NSError {
             let alert = UIAlertController(title: "Sorry", message: error.localizedDescription, preferredStyle: .alert)
             present(alert, animated: true, completion: .none)
         }
-        faceSource.faceChosen = {
-            [unowned self]
-            face in
-            self.faceReplacer.newFace = UIImage(named: "happy")
+        faceSource.faceChosen = { [unowned self] face in
+            self.faceReplacer.newFace = self.visage.convertFeaturesToEmojiImage()
         }
-        faceSource.initSource()
+//        faceSource.initSource()
     }
 }
 
