@@ -13,11 +13,11 @@
 		80C316131A46F3F800E4493F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 80C316111A46F3F800E4493F /* LaunchScreen.xib */; };
 		80C3161F1A46F3F800E4493F /* FaceDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C3161E1A46F3F800E4493F /* FaceDetectionTests.swift */; };
 		80C316291A46F41F00E4493F /* Visage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C316281A46F41F00E4493F /* Visage.swift */; };
+		F9199DAD1F7E3A6600D5C13D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F9199DAC1F7E3A6600D5C13D /* Images.xcassets */; };
 		F91F606C1F7D4BFF0005CA79 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F91F606A1F7D4BB80005CA79 /* AVFoundation.framework */; };
 		F91F606D1F7D4CFB0005CA79 /* LiveTranscribeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91F60301F7D47D30005CA79 /* LiveTranscribeViewController.swift */; };
 		F91F606E1F7D4D0E0005CA79 /* FaceReplacer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91F60661F7D481E0005CA79 /* FaceReplacer.swift */; };
 		F91F606F1F7D4D0E0005CA79 /* FaceSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91F60681F7D481E0005CA79 /* FaceSource.swift */; };
-		F91F60721F7D56F10005CA79 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F91F60711F7D54C30005CA79 /* Images.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,11 +41,11 @@
 		80C3161D1A46F3F800E4493F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		80C3161E1A46F3F800E4493F /* FaceDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceDetectionTests.swift; sourceTree = "<group>"; };
 		80C316281A46F41F00E4493F /* Visage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Visage.swift; sourceTree = "<group>"; };
+		F9199DAC1F7E3A6600D5C13D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		F91F60301F7D47D30005CA79 /* LiveTranscribeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTranscribeViewController.swift; sourceTree = "<group>"; };
 		F91F60661F7D481E0005CA79 /* FaceReplacer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceReplacer.swift; sourceTree = "<group>"; };
 		F91F60681F7D481E0005CA79 /* FaceSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSource.swift; sourceTree = "<group>"; };
 		F91F606A1F7D4BB80005CA79 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		F91F60711F7D54C30005CA79 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../curop/FaceTracker/FaceTracker/Images.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,12 +89,12 @@
 		80C316051A46F3F800E4493F /* FaceDetection */ = {
 			isa = PBXGroup;
 			children = (
+				F9199DAC1F7E3A6600D5C13D /* Images.xcassets */,
 				F91F602F1F7D47AE0005CA79 /* AR */,
 				80C316081A46F3F800E4493F /* AppDelegate.swift */,
 				80C3160A1A46F3F800E4493F /* ViewController.swift */,
 				80C316281A46F41F00E4493F /* Visage.swift */,
 				80C3160C1A46F3F800E4493F /* Main.storyboard */,
-				F91F60711F7D54C30005CA79 /* Images.xcassets */,
 				80C316111A46F3F800E4493F /* LaunchScreen.xib */,
 				80C316061A46F3F800E4493F /* Supporting Files */,
 			);
@@ -237,7 +237,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F91F60721F7D56F10005CA79 /* Images.xcassets in Resources */,
+				F9199DAD1F7E3A6600D5C13D /* Images.xcassets in Resources */,
 				80C3160E1A46F3F800E4493F /* Main.storyboard in Resources */,
 				80C316131A46F3F800E4493F /* LaunchScreen.xib in Resources */,
 			);
