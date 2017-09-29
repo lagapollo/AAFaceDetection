@@ -202,7 +202,7 @@
 				TargetAttributes = {
 					80C316021A46F3F800E4493F = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = 6CY9L434R3;
+						DevelopmentTeam = JP99H4V8K4;
 						LastSwiftMigration = 0820;
 					};
 					80C316171A46F3F800E4493F = {
@@ -385,11 +385,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 6CY9L434R3;
+				DEVELOPMENT_TEAM = JP99H4V8K4;
 				INFOPLIST_FILE = FaceDetection/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.juhennet.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.genesis.FaceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -400,11 +400,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 6CY9L434R3;
+				DEVELOPMENT_TEAM = JP99H4V8K4;
 				INFOPLIST_FILE = FaceDetection/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.juhennet.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.genesis.FaceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;

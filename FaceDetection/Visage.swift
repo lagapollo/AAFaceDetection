@@ -83,17 +83,9 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     var options : [String : AnyObject]?
     
     //MARK: CAPTURE-OUTPUT/ANALYSIS OF FACIAL-FEATURES
-    func facialDetection(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+    func detectFeatures(withFeatures features:[CIFaceFeature]) {
         
-        let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
-        let opaqueBuffer = Unmanaged<CVImageBuffer>.passUnretained(imageBuffer!).toOpaque()
-        let pixelBuffer = Unmanaged<CVPixelBuffer>.fromOpaque(opaqueBuffer).takeUnretainedValue()
-        let sourceImage = CIImage(cvPixelBuffer: pixelBuffer, options: nil)
-        options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject, CIDetectorImageOrientation : 6 as AnyObject]
-        
-        let features = self.faceDetector!.features(in: sourceImage, options: options)
-        
-        if (features.count != 0) {
+        if (features.count > 0) {
             
             if (onlyFireNotificatonOnStatusChange == true) {
                 if (self.faceDetected == false) {
@@ -239,6 +231,46 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
     }
     
+    func convertFeaturesToEmoji() -> String {
+        
+        var emojiLabel = ""
+//        print("=============================")
+//        print("leftEyeClose : \(String(describing: self.leftEyeClosed))")
+//        print("rightEyeClose : \(String(describing: self.rightEyeClosed))")
+//        print("hasSmile : \(String(describing: self.hasSmile))")
+//        print("isWinking : \(String(describing: self.isWinking))")
+//        print("isBlinking : \(String(describing: self.isBlinking))")
+        
+        emojiLabel = "neutral"
+        if (self.hasSmile == true) {
+           if (self.leftEyeClosed == true){
+                emojiLabel = "left_wink_open"
+            }
+            else if (self.rightEyeClosed == true) {
+                   emojiLabel = "right_wink_open"
+            }
+            else {
+                emojiLabel = "smile"
+            }
+        }
+        else {
+            if (self.leftEyeClosed == true){
+                emojiLabel = "left_wink"
+            }
+            else if (self.rightEyeClosed == true) {
+                emojiLabel = "right_wink"
+            }
+        }
+//        if ((self.leftEyeClosed == true && self.rightEyeClosed == true)){
+//            emojiLabel = "sleep"
+//        }
+        return emojiLabel
+    }
+    
+    func convertFeaturesToEmojiImage() -> UIImage {
+        return UIImage(named:convertFeaturesToEmoji())!
+    }
+    
     //TODO: 🚧 HELPER TO CONVERT BETWEEN UIDEVICEORIENTATION AND CIDETECTORORIENTATION 🚧
     fileprivate func convertOrientation(_ deviceOrientation: UIDeviceOrientation) -> Int {
         var orientation: Int = 0
@@ -255,4 +287,22 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         return 6
     }
+}
+
+
+extension String {
+    func image() -> UIImage! {
+        let size = CGSize(width: 30, height: 35)
+        UIGraphicsBeginImageContextWithOptions(size, false, 0);
+        UIColor.white.set()
+        
+        let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: size)
+        UIRectFill(CGRect(origin: CGPoint(x: 0, y: 0), size: size))
+        
+        (self as NSString).draw(in: rect, withAttributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 30)])
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image!
+    }
+    
 }

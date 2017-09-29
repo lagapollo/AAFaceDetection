@@ -35,132 +35,155 @@ import AVFoundation
 import GLKit
 
 class FaceReplacer: NSObject {
-  
+    
     var visage = Visage(optimizeFor: Visage.DetectorAccuracy.higherPerformance)
-  let imageView: GLKView
-  var newFace: UIImage? {
-    didSet {
-      if let newFace = newFace {
-        newFaceCI = CIImage(image: newFace)
-      } else {
-        newFaceCI = nil
-      }
+    let imageView: GLKView
+    var lastTimestamp:TimeInterval = 0
+    var count: Int = 0
+    var newFace: UIImage? {
+        didSet {
+            if let newFace = newFace {
+                newFaceCI = CIImage(image: newFace)
+            } else {
+                newFaceCI = nil
+            }
+        }
     }
-  }
-  
-  fileprivate var newFaceCI: CIImage?
-  fileprivate let eaglContext = EAGLContext(api: .openGLES2)
-  fileprivate let context: CIContext
-  fileprivate let detector: CIDetector
-  
-  init(imageView: GLKView) {
-    self.imageView = imageView
-    context = CIContext(eaglContext: self.eaglContext!)
-    detector = CIDetector(ofType: CIDetectorTypeFace, context: self.context, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh, CIDetectorTracking: true])!
-    super.init()
-    imageView.delegate = self
-    imageView.context = eaglContext!
+    var renderView:UIImageView!
+    fileprivate var newFaceCI: CIImage?
+    fileprivate let eaglContext = EAGLContext(api: .openGLES2)
+    fileprivate let context: CIContext
+    fileprivate let detector: CIDetector
     
-  }
-  
-  fileprivate let captureSession = AVCaptureSession()
-  fileprivate var cameraImage: CIImage?
-  
-  
-  fileprivate func replaceFaceInImage(_ startImage: CIImage) -> CIImage {
-    guard let newFaceCI = newFaceCI else { return startImage }
-    
-    if let face = detector.features(in: startImage).first as? CIFaceFeature {
-      
-      let compositingFilter = CIFilter(name: "CISourceAtopCompositing")!
-      let transformFilter = CIFilter(name: "CIAffineTransform")!
-      
-      let angle = face.hasFaceAngle ? face.faceAngle : 0
-      let angleInRadians = CGFloat(angle * Float(M_PI / -180.0))
-      let newFaceSize = newFaceCI.extent.size
-      
-      transformFilter.setValue(newFaceCI, forKey: kCIInputImageKey)
-      let translate = CGAffineTransform(translationX: face.bounds.origin.x, y: face.bounds.origin.y)
-      
-      let scale = CGAffineTransform(scaleX: face.bounds.width / newFaceSize.width, y: face.bounds.height / newFaceSize.height)
-      let rotation = CGAffineTransform(rotationAngle: angleInRadians)
-      
-      var finalTransform = CGAffineTransform.identity
-      finalTransform = finalTransform.concatenating(scale)
-      finalTransform = finalTransform.concatenating(rotation)
-      finalTransform = finalTransform.concatenating(translate)
-      
-      transformFilter.setValue(NSValue(cgAffineTransform: finalTransform), forKey: "inputTransform")
-      let transformResult = transformFilter.outputImage!
-      compositingFilter.setValue(startImage, forKey: kCIInputBackgroundImageKey)
-      compositingFilter.setValue(transformResult, forKey: kCIInputImageKey)
-      
-      return compositingFilter.outputImage!
-      
-    } else {
-      return startImage
+    init(imageView: GLKView, renderView:UIImageView) {
+        self.imageView = imageView
+        self.renderView = renderView
+        newFace = "😇".image()
+        newFaceCI = CIImage(image: newFace!)
+        context = CIContext(eaglContext: self.eaglContext!)
+        let options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject, CIDetectorAccuracy: CIDetectorAccuracyLow as AnyObject, CIDetectorTracking: true as AnyObject]
+        
+        detector = CIDetector(ofType: CIDetectorTypeFace, context: self.context, options:options)!
+        
+        super.init()
+        imageView.delegate = self
+        imageView.context = eaglContext!
+        
     }
-  }
     
-  
-  func startCapture() throws
-  {
-    captureSession.sessionPreset = AVCaptureSessionPresetPhoto
-    let cameraError = NSError(domain: "facereplace", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to access front camera"])
+    fileprivate let captureSession = AVCaptureSession()
+    fileprivate var cameraImage: CIImage?
     
-    let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaTypeVideo, position: AVCaptureDevice.Position.front)
-
-    guard let frontCamera = discoverySession?.devices.first else {
-        throw cameraError
+    
+    fileprivate func replaceFaceInImage(_ startImage: CIImage) -> CIImage {
+        
+        guard let newFaceCI = newFaceCI else { return startImage }
+        let options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject]
+        
+        if let faces = detector.features(in: startImage, options:options) as? [CIFaceFeature] {
+            if faces.count > 0 {
+                
+                if (count % 8 == 0){
+                    count = 0
+                    visage.detectFeatures(withFeatures: faces)
+                    newFace = visage.convertFeaturesToEmojiImage()
+                }
+                count = count+1
+                let face = faces[0]
+                let compositingFilter = CIFilter(name: "CISourceAtopCompositing")!
+                let transformFilter = CIFilter(name: "CIAffineTransform")!
+                
+                let angle = face.hasFaceAngle ? face.faceAngle : 0
+                let angleInRadians = CGFloat(angle * Float(M_PI / -180.0))
+                let newFaceSize = newFaceCI.extent.size
+                
+                transformFilter.setValue(newFaceCI, forKey: kCIInputImageKey)
+                let translate = CGAffineTransform(translationX: face.bounds.origin.x, y: face.bounds.origin.y)
+                
+                let scale = CGAffineTransform(scaleX: face.bounds.width / newFaceSize.width, y: face.bounds.height / newFaceSize.height)
+                let rotation = CGAffineTransform(rotationAngle: angleInRadians)
+                
+                var finalTransform = CGAffineTransform.identity
+                finalTransform = finalTransform.concatenating(scale)
+                finalTransform = finalTransform.concatenating(rotation)
+                finalTransform = finalTransform.concatenating(translate)
+                
+                transformFilter.setValue(NSValue(cgAffineTransform: finalTransform), forKey: "inputTransform")
+                let transformResult = transformFilter.outputImage!
+                compositingFilter.setValue(startImage, forKey: kCIInputBackgroundImageKey)
+                compositingFilter.setValue(transformResult, forKey: kCIInputImageKey)
+                
+                return compositingFilter.outputImage!
+                
+            } else {
+                return startImage
+            }
+        }
+        else {
+            return startImage
+        }
     }
-    do
+    
+    
+    func startCapture() throws
     {
-      let input = try AVCaptureDeviceInput(device: frontCamera)
-      captureSession.addInput(input)
+        captureSession.sessionPreset = AVCaptureSessionPresetPhoto
+        let cameraError = NSError(domain: "facereplace", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to access front camera"])
+        
+        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaTypeVideo, position: AVCaptureDevice.Position.front)
+        
+        guard let frontCamera = discoverySession?.devices.first else {
+            throw cameraError
+        }
+        do
+        {
+            let input = try AVCaptureDeviceInput(device: frontCamera)
+            captureSession.addInput(input)
+        }
+        
+        let videoOutput = AVCaptureVideoDataOutput()
+        
+        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sample buffer delegate", qos: DispatchQoS.userInitiated, attributes: DispatchQueue.Attributes()))
+        if captureSession.canAddOutput(videoOutput)
+        {
+            captureSession.addOutput(videoOutput)
+        }
+        
+        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        previewLayer?.frame = UIScreen.main.bounds
+        previewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
+        visage.visageCameraView.layer.addSublayer(previewLayer!)
+        
+        captureSession.startRunning()
     }
     
-    let videoOutput = AVCaptureVideoDataOutput()
-    
-    videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sample buffer delegate", qos: DispatchQoS.userInitiated, attributes: DispatchQueue.Attributes()))
-    if captureSession.canAddOutput(videoOutput)
-    {
-      captureSession.addOutput(videoOutput)
+    func stopCapture() {
+        captureSession.stopRunning()
     }
-
-    let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-    previewLayer?.frame = UIScreen.main.bounds
-    previewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
-    visage.visageCameraView.layer.addSublayer(previewLayer!)
-    
-    captureSession.startRunning()
-  }
-  
-  func stopCapture() {
-    captureSession.stopRunning()
-  }
 }
 
 extension FaceReplacer: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-    connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIApplication.shared.statusBarOrientation.rawValue)!
-    guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-    cameraImage = CIImage(cvPixelBuffer: pixelBuffer)
-    DispatchQueue.main.async {
-      self.imageView.setNeedsDisplay()
+        
+        connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIApplication.shared.statusBarOrientation.rawValue)!
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        cameraImage = CIImage(cvPixelBuffer: pixelBuffer)
+        DispatchQueue.main.async {
+            self.imageView.setNeedsDisplay()
+        }
+        //visage.facialDetection(captureOutput, didOutputSampleBuffer: sampleBuffer, from: connection)
+        
     }
-        visage.facialDetection(captureOutput, didOutputSampleBuffer: sampleBuffer, from: connection)
-    
-  }
 }
 
 extension FaceReplacer: GLKViewDelegate {
-  func glkView(_ view: GLKView, drawIn rect: CGRect) {
-    guard let cameraImage = cameraImage else { return }
-    
-    let result = replaceFaceInImage(cameraImage)
-    
-    context.draw(result,
-                 in: AVMakeRect(aspectRatio: result.extent.size, insideRect: CGRect(x: 0, y: 0, width: view.drawableWidth, height: view.drawableHeight)), from: cameraImage.extent)
-    
-  }
+    func glkView(_ view: GLKView, drawIn rect: CGRect) {
+        guard let cameraImage = cameraImage else { return }
+        
+        
+        lastTimestamp = Date().timeIntervalSince1970
+        let result = replaceFaceInImage(cameraImage)
+        self.renderView.image = UIImage(ciImage: result, scale: 1, orientation: .up)
+        
+    }
 }

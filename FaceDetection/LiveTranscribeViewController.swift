@@ -34,6 +34,7 @@ import AVFoundation
 
 class LiveTranscribeViewController: UIViewController {
     
+    @IBOutlet weak var ivRender: UIImageView!
     @IBOutlet weak var glkView: GLKView!
     var faceReplacer: FaceReplacer!
     
@@ -46,6 +47,8 @@ class LiveTranscribeViewController: UIViewController {
         faceReplacer.stopCapture()
         dismiss(animated: true, completion: .none)
     }
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,7 +85,7 @@ extension LiveTranscribeViewController {
 
 extension LiveTranscribeViewController {
     fileprivate func initialiseFaceReplacer() {
-        faceReplacer = FaceReplacer(imageView: glkView)
+        faceReplacer = FaceReplacer(imageView: glkView, renderView: self.ivRender)
         do {
             try faceReplacer.startCapture()
         } catch let error as NSError {
