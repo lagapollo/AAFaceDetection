@@ -36,6 +36,7 @@ import GLKit
 
 class FaceReplacer: NSObject {
   
+    var visage = Visage(optimizeFor: Visage.DetectorAccuracy.higherPerformance)
   let imageView: GLKView
   var newFace: UIImage? {
     didSet {
@@ -59,6 +60,7 @@ class FaceReplacer: NSObject {
     super.init()
     imageView.delegate = self
     imageView.context = eaglContext!
+    
   }
   
   fileprivate let captureSession = AVCaptureSession()
@@ -99,6 +101,7 @@ class FaceReplacer: NSObject {
       return startImage
     }
   }
+    
   
   func startCapture() throws
   {
@@ -123,6 +126,11 @@ class FaceReplacer: NSObject {
     {
       captureSession.addOutput(videoOutput)
     }
+
+    let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+    previewLayer?.frame = UIScreen.main.bounds
+    previewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
+    visage.visageCameraView.layer.addSublayer(previewLayer!)
     
     captureSession.startRunning()
   }
@@ -140,6 +148,7 @@ extension FaceReplacer: AVCaptureVideoDataOutputSampleBufferDelegate {
     DispatchQueue.main.async {
       self.imageView.setNeedsDisplay()
     }
+        visage.facialDetection(captureOutput, didOutputSampleBuffer: sampleBuffer, from: connection)
     
   }
 }

@@ -56,7 +56,7 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     fileprivate let visageRightEyeOpenNotification = Notification(name: Notification.Name(rawValue: "visageRightEyeOpenNotification"), object: nil)
     
     //Private variables that cannot be accessed by other classes in any way.
-    fileprivate var faceDetector : CIDetector?
+    var faceDetector : CIDetector?
     fileprivate var videoDataOutput : AVCaptureVideoDataOutput?
     fileprivate var videoDataOutputQueue : DispatchQueue?
     fileprivate var cameraPreviewLayer : AVCaptureVideoPreviewLayer?
@@ -64,15 +64,10 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     fileprivate let notificationCenter : NotificationCenter = NotificationCenter.default
     fileprivate var currentOrientation : Int?
     
-    init(cameraPosition : CameraDevice, optimizeFor : DetectorAccuracy) {
+    init(optimizeFor : DetectorAccuracy) {
         super.init()
         
         currentOrientation = convertOrientation(UIDevice.current.orientation)
-        
-        switch cameraPosition {
-        case .faceTimeCamera : self.captureSetup(AVCaptureDevicePosition.front)
-        case .iSightCamera : self.captureSetup(AVCaptureDevicePosition.back)
-        }
         
         var faceDetectorOptions : [String : AnyObject]?
         
@@ -83,67 +78,12 @@ class Visage: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         
         self.faceDetector = CIDetector(ofType: CIDetectorTypeFace, context: nil, options: faceDetectorOptions)
     }
-    
-    //MARK: SETUP OF VIDEOCAPTURE
-    func beginFaceDetection() {
-        self.captureSession.startRunning()
-    }
-    
-    func endFaceDetection() {
-        self.captureSession.stopRunning()
-    }
-    
-    fileprivate func captureSetup (_ position : AVCaptureDevicePosition) {
-        var captureError : NSError?
-        var captureDevice : AVCaptureDevice!
-        
-        for testedDevice in AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo){
-            if ((testedDevice as AnyObject).position == position) {
-                captureDevice = testedDevice as! AVCaptureDevice
-            }
-        }
-        
-        if (captureDevice == nil) {
-            captureDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
-        }
-        
-        var deviceInput : AVCaptureDeviceInput?
-        do {
-            deviceInput = try AVCaptureDeviceInput(device: captureDevice)
-        } catch let error as NSError {
-            captureError = error
-            deviceInput = nil
-        }
-        captureSession.sessionPreset = AVCaptureSessionPresetHigh
-        
-        if (captureError == nil) {
-            if (captureSession.canAddInput(deviceInput)) {
-                captureSession.addInput(deviceInput)
-            }
-            
-            self.videoDataOutput = AVCaptureVideoDataOutput()
-            self.videoDataOutput!.videoSettings = [kCVPixelBufferPixelFormatTypeKey as AnyHashable: Int(kCVPixelFormatType_32BGRA)]
-            self.videoDataOutput!.alwaysDiscardsLateVideoFrames = true
-            self.videoDataOutputQueue = DispatchQueue(label: "VideoDataOutputQueue", attributes: [])
-            self.videoDataOutput!.setSampleBufferDelegate(self, queue: self.videoDataOutputQueue!)
-            
-            if (captureSession.canAddOutput(self.videoDataOutput)) {
-                captureSession.addOutput(self.videoDataOutput)
-            }
-        }
-        
-        visageCameraView.frame = UIScreen.main.bounds
-		
-		let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer?.frame = UIScreen.main.bounds
-        previewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
-        visageCameraView.layer.addSublayer(previewLayer!)
-    }
+
     
     var options : [String : AnyObject]?
     
     //MARK: CAPTURE-OUTPUT/ANALYSIS OF FACIAL-FEATURES
-    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+    func facialDetection(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
         
         let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
         let opaqueBuffer = Unmanaged<CVImageBuffer>.passUnretained(imageBuffer!).toOpaque()

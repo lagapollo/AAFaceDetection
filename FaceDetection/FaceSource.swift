@@ -49,8 +49,8 @@ class FaceSource: NSObject {
     
     var faceChosen: ((_ face: UIImage) -> ())?
     
-    func initSource() {
-        faceChosen?(UIImage(named: "happy")!)
+    func setSource(_ image: UIImage) {
+        faceChosen?(image)
     }
     
 }

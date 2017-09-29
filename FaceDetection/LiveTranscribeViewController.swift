@@ -51,11 +51,27 @@ class LiveTranscribeViewController: UIViewController {
         super.viewDidLoad()
         initialiseFaceReplacer()
         startRecording()
+        
+        view.insertSubview(faceReplacer.visage.visageCameraView, at: 0)
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "visageFaceDetectedNotification"), object: nil, queue: OperationQueue.main, using: { notification in
+            
+            if ((self.faceReplacer.visage.hasSmile == true && self.faceReplacer.visage.isWinking == true)) {
+                print("special_wink")
+                self.faceSource.setSource(UIImage(named: "left_wink_open")!)
+            } else if ((self.faceReplacer.visage.isWinking == true && self.faceReplacer.visage.hasSmile == false)) {
+                print("wink")
+                self.faceSource.setSource(UIImage(named: "left_wink")!)
+            } else if ((self.faceReplacer.visage.hasSmile == true && self.faceReplacer.visage.isWinking == false)) {
+                self.faceSource.setSource(UIImage(named: "smile")!)
+                print("smile")
+            } else {
+                self.faceSource.setSource(UIImage(named: "neutral")!)
+                print("normal")
+            }
+        })
     }
     
-    @IBAction func clickOnStart(_ sender: Any) {
-        faceSource.initSource()
-    }
 }
 
 extension LiveTranscribeViewController {
@@ -76,9 +92,8 @@ extension LiveTranscribeViewController {
         faceSource.faceChosen = {
             [unowned self]
             face in
-            self.faceReplacer.newFace = UIImage(named: "happy")
+            self.faceReplacer.newFace = face
         }
-        faceSource.initSource()
     }
 }
 

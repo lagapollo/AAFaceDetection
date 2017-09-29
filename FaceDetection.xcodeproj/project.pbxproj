@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		80C316091A46F3F800E4493F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C316081A46F3F800E4493F /* AppDelegate.swift */; };
-		80C3160B1A46F3F800E4493F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C3160A1A46F3F800E4493F /* ViewController.swift */; };
 		80C3160E1A46F3F800E4493F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80C3160C1A46F3F800E4493F /* Main.storyboard */; };
 		80C316131A46F3F800E4493F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 80C316111A46F3F800E4493F /* LaunchScreen.xib */; };
 		80C3161F1A46F3F800E4493F /* FaceDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C3161E1A46F3F800E4493F /* FaceDetectionTests.swift */; };
@@ -257,7 +256,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80C3160B1A46F3F800E4493F /* ViewController.swift in Sources */,
 				F91F606D1F7D4CFB0005CA79 /* LiveTranscribeViewController.swift in Sources */,
 				F91F606E1F7D4D0E0005CA79 /* FaceReplacer.swift in Sources */,
 				80C316291A46F41F00E4493F /* Visage.swift in Sources */,
