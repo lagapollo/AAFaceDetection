@@ -55,8 +55,7 @@ class FaceReplacer: NSObject {
     fileprivate let eaglContext = EAGLContext(api: .openGLES2)
     fileprivate let context: CIContext
     fileprivate let detector: CIDetector
-    
-    init(imageView: GLKView, finalRenderView:UIImageView) {
+     init(imageView: GLKView, finalRenderView:UIImageView) {
         self.imageView = imageView
         self.finalRenderView = finalRenderView
         newFace = "😇".image()
@@ -75,10 +74,11 @@ class FaceReplacer: NSObject {
     
     
     fileprivate func replaceFaceInImage(_ startImage: CIImage) -> CIImage {
+        
         guard let newFaceCI = newFaceCI else { return startImage }
-        let options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject, CIDetectorImageOrientation : orientation as AnyObject]
+        let options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject]
 
-        if let faces = detector.features(in: startImage, options:options) as? [CIFaceFeature] {
+        if let faces = detector.features(in: startImage, options:op tions) as? [CIFaceFeature] {
             if faces.count > 0 {
                 visage.detectFeatures(withFeatures: faces)
                 newFace = visage.convertFeaturesToEmojiImage()
@@ -140,6 +140,9 @@ class FaceReplacer: NSObject {
         guard let frontCamera = captureDevice else {
             throw cameraError
         }
+        
+        
+        
         do
         {
             let input = try AVCaptureDeviceInput(device: frontCamera)
@@ -153,8 +156,18 @@ class FaceReplacer: NSObject {
         videoOutput.alwaysDiscardsLateVideoFrames = true
         
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sample buffer delegate", qos: DispatchQoS.userInitiated, attributes: DispatchQueue.Attributes()))
+        
+        let connection = videoOutput.connection(withMediaType: AVMediaTypeVideo)
+        if connection != nil,
+            let connect = connection,
+            connect.isVideoOrientationSupported {
+            connect.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
+        }
+        
+        
         if captureSession.canAddOutput(videoOutput)
         {
+            
             captureSession.addOutput(videoOutput)
         }
         
@@ -174,11 +187,18 @@ class FaceReplacer: NSObject {
 
 extension FaceReplacer: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ captureOutput: AVCaptureOutput, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        
         let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
         let opaqueBuffer = Unmanaged<CVImageBuffer>.passUnretained(imageBuffer!).toOpaque()
         let pixelBuffer = Unmanaged<CVPixelBuffer>.fromOpaque(opaqueBuffer).takeUnretainedValue()
+        let sourceImage = CIImage(cvPixelBuffer: pixelBuffer, options: nil)
         
-        cameraImage = CIImage(cvPixelBuffer: pixelBuffer)
+        cameraImage = sourceImage
+//        let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
+//        let opaqueBuffer = Unmanaged<CVImageBuffer>.passUnretained(imageBuffer!).toOpaque()
+//        let pixelBuffer = Unmanaged<CVPixelBuffer>.fromOpaque(opaqueBuffer).takeUnretainedValue()
+//
+//        cameraImage = CIImage(cvPixelBuffer: pixelBuffer)
         DispatchQueue.main.async {
             self.imageView.setNeedsDisplay()
         }
@@ -192,7 +212,11 @@ extension FaceReplacer: GLKViewDelegate {
         guard let cameraImage = cameraImage else { return }
         
         let result = replaceFaceInImage(cameraImage)
-        self.finalRenderView?.image = UIImage(ciImage:result)
+        
+        self.finalRenderView?.image = UIImage(ciImage: result, scale: 1.0, orientation: UIImageOrientation.up)
+        //UIImage(ciImage:result.convertCIImageToCGImage())
+        
+        
 //        UIImage(ciImage: result).draw(in: renderImageView!.frame)
 //        context.draw(result,
 //                     in: AVMakeRect(aspectRatio: result.extent.size, insideRect: CGRect(x: 0, y: 0, width: view.drawableWidth, height: view.drawableHeight)), from: cameraImage.extent)
@@ -200,4 +224,27 @@ extension FaceReplacer: GLKViewDelegate {
         //renderImageView?.image = UIImage(ciImage: result.oriented(.up))
     }
 }
+
+
+extension CIImage {
+    var image: UIImage? { return UIImage(ciImage: self) }
+    func rotated(_ angle: CGFloat) -> CIImage? {
+        let transform = CGAffineTransform(translationX: extent.midX, y: extent.midY)
+            .rotated(by: angle * .pi /  180)
+            .translatedBy(x: -extent.midX, y: -extent.midY)
+        
+//        let transform = CGAffineTransform(rotationAngle: angle * .pi /  180)
+        return CIFilter(name: "CIAffineTransform", withInputParameters: [kCIInputImageKey: self, kCIInputTransformKey: NSValue(cgAffineTransform: transform)])?.outputImage
+    }
+    var rotatedLeft: CIImage? { return rotated(90) }
+    var rotatedRight: CIImage? { return rotated(-90) }
+    
+    func convertCIImageToCGImage() -> CGImage! {
+        let context = CIContext(options: nil)
+        
+        return context.createCGImage(self, from: self.extent)
+        
+    }
+}
+
 

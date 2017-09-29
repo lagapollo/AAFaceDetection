@@ -90,9 +90,7 @@ class Visage: NSObject {
     var options : [String : AnyObject]?
 
     func detectFeatures(withFeatures features:[CIFaceFeature]) {
-//        options = [CIDetectorSmile : true as AnyObject, CIDetectorEyeBlink: true as AnyObject, CIDetectorImageOrientation : 6 as AnyObject]
-//        let features = self.faceDetector!.features(in: sourceImage, options: options)
-//
+
         if (features.count > 0) {
             
             if (onlyFireNotificatonOnStatusChange == true) {
